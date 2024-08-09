@@ -6,15 +6,15 @@ import {
   View,
 } from "react-native";
 import { styles } from "../shared/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToDos from "../components/ToDos";
 import { SafeAreaView } from "react-native-safe-area-context";
-let idStep = 5;
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// let idStep = 0;
 
 export default function Home() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
   const [categories, setCategories] = useState([
     { id: 0, name: "All", active: true },
     { id: 1, name: "Active", active: false },
@@ -22,39 +22,55 @@ export default function Home() {
   ]);
   const [selectedCategory, SetSelectedCategory] = useState(0);
   const [toDos, setToDos] = useState([
-    {
-      id: 1,
-      title: "task 1",
-      description: "one one one",
-      status: "done",
-      categoryId: 2,
-    },
-    {
-      id: 2,
-      title: "task 2",
-      description: "two two two",
-      status: "active",
-      categoryId: 1,
-    },
-    {
-      id: 3,
-      title: "task 3",
-      description: "three three three",
-      status: "done",
-      categoryId: 2,
-    },
-    {
-      id: 4,
-      title: "task 4",
-      description: "four four four",
-      status: "active",
-      categoryId: 1,
-    },
+    // {
+    //   id: 1,
+    //   title: "task 1",
+    //   description: "one one one",
+    //   status: "done",
+    //   categoryId: 2,
+    // },
+    // {
+    //   id: 2,
+    //   title: "task 2",
+    //   description: "two two two",
+    //   status: "active",
+    //   categoryId: 1,
+    // },
+    // {
+    //   id: 3,
+    //   title: "task 3",
+    //   description: "three three three",
+    //   status: "done",
+    //   categoryId: 2,
+    // },
+    // {
+    //   id: 4,
+    //   title: "task 4",
+    //   description: "four four four",
+    //   status: "active",
+    //   categoryId: 1,
+    // },
   ]);
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const todos = await AsyncStorage.getItem("todos");
+        console.log("todos use efect");
+        console.log(todos);
+        if (todos) {
+          setToDos(JSON.parse(todos));
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getData();
+  }, []);
   const handleDeleteTodo = (id) => {
     let newToDo = [...toDos];
     newToDo = newToDo.filter((todo) => todo.id !== id);
     setToDos(newToDo);
+    saveDataToAsyncStorage(newToDo);
   };
   const handleAsDone = (item) => {
     console.log(item);
@@ -62,8 +78,9 @@ export default function Home() {
     const newTodos = [...toDos];
     let index = newTodos.findIndex((todo) => todo.id === item.id);
     newTodos[index].status = "done";
-    newTodos[index].categoryId=2;
+    newTodos[index].categoryId = 2;
     setToDos(newTodos);
+    saveDataToAsyncStorage(newTodos);
   };
   const handleChangeTitle = (value) => {
     setTitle(value);
@@ -77,9 +94,17 @@ export default function Home() {
       description,
       status: "active",
       categoryId: 1,
-      id: idStep++,
+      id: Date.now(),
     };
     setToDos([...toDos, newToDo]);
+    saveDataToAsyncStorage([...toDos, newToDo]);
+  };
+  const saveDataToAsyncStorage = async (todos) => {
+    try {
+      await AsyncStorage.setItem("todos", JSON.stringify(todos));
+    } catch (e) {
+      console.log("error when saving data to async storage");
+    }
   };
   const handleSelectedCategory = (cat) => {
     // let newBtns = [...categories];
