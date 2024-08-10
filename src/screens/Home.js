@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // let idStep = 0;
 
 export default function Home() {
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categories, setCategories] = useState([
@@ -21,36 +22,7 @@ export default function Home() {
     { id: 2, name: "Done", active: false },
   ]);
   const [selectedCategory, SetSelectedCategory] = useState(0);
-  const [toDos, setToDos] = useState([
-    // {
-    //   id: 1,
-    //   title: "task 1",
-    //   description: "one one one",
-    //   status: "done",
-    //   categoryId: 2,
-    // },
-    // {
-    //   id: 2,
-    //   title: "task 2",
-    //   description: "two two two",
-    //   status: "active",
-    //   categoryId: 1,
-    // },
-    // {
-    //   id: 3,
-    //   title: "task 3",
-    //   description: "three three three",
-    //   status: "done",
-    //   categoryId: 2,
-    // },
-    // {
-    //   id: 4,
-    //   title: "task 4",
-    //   description: "four four four",
-    //   status: "active",
-    //   categoryId: 1,
-    // },
-  ]);
+  const [toDos, setToDos] = useState([]);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -67,6 +39,7 @@ export default function Home() {
     getData();
   }, []);
   const handleDeleteTodo = (id) => {
+    // setModalVisible(true);
     let newToDo = [...toDos];
     newToDo = newToDo.filter((todo) => todo.id !== id);
     setToDos(newToDo);
@@ -98,6 +71,8 @@ export default function Home() {
     };
     setToDos([...toDos, newToDo]);
     saveDataToAsyncStorage([...toDos, newToDo]);
+    setTitle("");
+    setDescription("");
   };
   const saveDataToAsyncStorage = async (todos) => {
     try {
@@ -107,12 +82,6 @@ export default function Home() {
     }
   };
   const handleSelectedCategory = (cat) => {
-    // let newBtns = [...categories];
-    // newBtns = newBtns.map((btn) => ({
-    //   ...btn,
-    //   active: btn.id === button.id ? (btn.active = true) : (btn.active = false),
-    // }));
-    // setCategories(newBtns);
     SetSelectedCategory(cat.id);
   };
   const filteredToDos = !selectedCategory

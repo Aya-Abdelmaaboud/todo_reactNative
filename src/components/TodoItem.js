@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { styles } from "../shared/styles";
 
-import { Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Text, Touchable, TouchableOpacity, View, Button,Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
+
 export default function TodoItem({ item, handleDeleteTodo, handleAsDone }) {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleDelete = (id) => {
+    handleDeleteTodo(id)
+    setModalVisible(false); 
+  };
+  const handleCancelModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <TouchableOpacity
@@ -31,6 +40,7 @@ export default function TodoItem({ item, handleDeleteTodo, handleAsDone }) {
         </Text>
         <Text>{item.description}</Text>
       </View>
+      
       <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
         {item.status === "active" && (
           <TouchableOpacity onPress={()=>handleAsDone(item)}>
@@ -41,10 +51,27 @@ export default function TodoItem({ item, handleDeleteTodo, handleAsDone }) {
           <AntDesign name="checksquareo" size={20} color="green" />
         )}
 
-        <TouchableOpacity onPress={() => handleDeleteTodo(item.id)}>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Feather name="trash-2" size={22} color="red" />
         </TouchableOpacity>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)} // Required for Android back button
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Are you sure you want to delete this item?</Text>
+            <View style={styles.buttonContainer}>
+              <Button title="Cancel" onPress={handleCancelModal} />
+              <Button title="Delete" color="red" onPress={()=>handleDelete(item.id)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
       </View>
     </TouchableOpacity>
   );
 }
+
